@@ -10,3 +10,11 @@ main > .container {
     background-size: contain;
     background-repeat: no-repeat;
 }
+
+.letter {
+    border: 1px solid grey;
+}
+
+.letter-selected {
+    border: 2px solid green;
+}

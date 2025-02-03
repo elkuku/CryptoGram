@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Service\PhraseService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/', name: 'app_default', methods: ['GET'])]
@@ -12,13 +12,21 @@ class DefaultController extends BaseController
 {
     public function __invoke(
         #[Autowire('%kernel.project_dir%')] string $projectDir,
+        PhraseService                              $phraseService,
     ): Response
     {
+        $lang = 'de';
+        $phraseService->setLang($lang);
+        $phrase = $phraseService->getRandomPhrase();
+
+        $uniqueLetters = $phraseService->getUniqueLetters($phrase);
+
         return $this->render('default/index.html.twig', [
-            'controller_name' => 'DefaultController',
-            'php_version' => PHP_VERSION,
-            'symfony_version' => Kernel::VERSION,
-            'project_dir' => $projectDir,
+            'phrase' => $phrase,
+            'letters' => $phraseService->getLetters($phrase),
+            'unique_letters' => $uniqueLetters,
+            'char_list' => $phraseService->getCharList(),
+            'hints' => $phraseService->getHints($uniqueLetters, 5),
         ]);
     }
 }
