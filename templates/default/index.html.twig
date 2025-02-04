@@ -42,7 +42,7 @@
                                 {% if char not in unique_letters %}
                                     class="btn btn-outline-secondary"  disabled
                                 {% else %}
-                                    class="btn btn-secondary"
+                                    class="btn btn-info"
                                     {{ stimulus_action('crypto', 'guessLetter', 'click', {letter:char}) }}
                                 {% endif %}
                         >

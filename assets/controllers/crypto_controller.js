@@ -20,8 +20,7 @@ export default class extends Controller {
         //console.error('connecting...')
         for (let target of this.keyTargets) {
             if (this.hintsValue.includes(target.textContent.trim())) {
-                target.classList.remove('btn-secondary')
-                target.classList.add('btn-success')
+                this._setButtonClass(target, 'btn-success')
             }
         }
 
@@ -30,6 +29,7 @@ export default class extends Controller {
                 if (letter.letter === hint) {
                     this.solvedLetters.push(letter.index)
                     this._setLetter(letter.index, letter)
+                    this._checkLetterCompleted(hint)
                     break
                 }
             }
@@ -37,7 +37,9 @@ export default class extends Controller {
     }
 
     selectLetter(event) {
-        if (this.solvedLetters.includes(event.params.index)) {return}
+        if (this.solvedLetters.includes(event.params.index)) {
+            return
+        }
         console.log('selectLetter', event);
         console.log('selectLetter index', event.params.index);
         for (let target of this.letterTargets) {
@@ -59,9 +61,12 @@ export default class extends Controller {
 
             return;
         }
-        console.log(event.params.letter, this.lettersValue[this.selectedLetter]);
-        if (event.params.letter === this.lettersValue[this.selectedLetter].letter) {
-            this._setLetter(this.selectedLetter, this.lettersValue[this.selectedLetter])
+        const letter = this.lettersValue[this.selectedLetter]
+        console.log(event.params.letter, letter.letter);
+        if (event.params.letter === letter.letter) {
+            this.solvedLetters.push(letter.index)
+            this._setLetter(this.selectedLetter, letter)
+            this._checkLetterCompleted(event.params.letter)
         } else {
             this._updateField(this.selectedLetter, 'no')
 
@@ -76,10 +81,41 @@ export default class extends Controller {
 
     _setLetter(targetIndex, letter) {
         this.letterTargets[targetIndex].innerHTML = letter.letter + '<br />' + letter.code;
-
     }
 
     _updateField(targetIndex, text) {
         this.letterTargets[targetIndex].innerHTML = text;
+    }
+
+    _checkLetterCompleted(check) {
+        console.log('checkLetter', check);
+        for (let letter of this.lettersValue) {
+            if (letter.letter === check) {
+                if (false === this.solvedLetters.includes(letter.index)) {
+                    console.log('missing ' + check)
+                    for (let target of this.keyTargets) {
+                        if (check===target.textContent.trim()) {
+                            this._setButtonClass(target, 'btn-success')
+                        }
+                    }
+                    return;
+                } else {
+                    console.log('found ' + check)
+                }
+            }
+        }
+        console.log('completed' + check)
+        for (let target of this.keyTargets) {
+            if (check===target.textContent.trim()) {
+                this._setButtonClass(target, 'btn-secondary')
+            }
+        }
+    }
+
+    _setButtonClass(element, className) {
+        element.classList.remove('btn-success')
+        element.classList.remove('btn-secondary')
+        element.classList.remove('btn-info')
+        element.classList.add(className)
     }
 }
