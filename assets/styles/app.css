@@ -12,7 +12,7 @@ main > .container {
 }
 
 .letter {
-    border: 1px solid grey;
+    border: 0px solid grey;
 }
 
 .letter-selected {

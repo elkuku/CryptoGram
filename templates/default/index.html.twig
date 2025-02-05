@@ -7,7 +7,9 @@
         {
             'letters': letters,
             'hints': hints,
-        }) }}>
+        }) }}
+            {{ stimulus_action('crypto', 'handleKeyDown', 'keydown@window') }}
+    >
         <div class="row row-cols-auto">
             {% for letter in letters %}
                 <div
@@ -53,6 +55,13 @@
             </div>
         </div>
     </div>
+
+    <hr>
+
+    <button class="btn btn-info">A</button> - Vorhanden <br>
+    <button class="btn btn-success">A</button> - Gefunden <br>
+    <button class="btn btn-secondary">A</button> - Alle gefunden <br>
+    <button class="btn btn-outline-secondary" disabled>A</button> - Nicht vorhanden <br>
 
     <span title="{{ phrase }}">.</span>
 

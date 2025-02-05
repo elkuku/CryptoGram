@@ -79,6 +79,17 @@ export default class extends Controller {
         //this._setLetter(this.selectedLetter, this.lettersValue[this.selectedLetter]);
     }
 
+    handleKeyDown(event) {
+        console.log('handleKeyDown', event);
+        console.log('handleKeyDown', event.key);
+        if ('ArrowRight' === event.key) {
+            console.log('arrowRight');
+        }else if ('ArrowLeft' === event.key) {
+            console.log('arrowLeft');
+
+        }
+    }
+
     _setLetter(targetIndex, letter) {
         this.letterTargets[targetIndex].innerHTML = letter.letter + '<br />' + letter.code;
     }
@@ -87,29 +98,49 @@ export default class extends Controller {
         this.letterTargets[targetIndex].innerHTML = text;
     }
 
-    _checkLetterCompleted(check) {
-        console.log('checkLetter', check);
-        for (let letter of this.lettersValue) {
-            if (letter.letter === check) {
-                if (false === this.solvedLetters.includes(letter.index)) {
-                    console.log('missing ' + check)
+    _checkLetterCompleted(letter) {
+        for (let value of this.lettersValue) {
+            if (value.letter === letter) {
+                if (false === this.solvedLetters.includes(value.index)) {
                     for (let target of this.keyTargets) {
-                        if (check===target.textContent.trim()) {
+                        if (target.textContent.trim() === letter) {
                             this._setButtonClass(target, 'btn-success')
                         }
                     }
+
+                    // Letters missing...
                     return;
-                } else {
-                    console.log('found ' + check)
                 }
             }
         }
-        console.log('completed' + check)
+
+        // All letters found
+
         for (let target of this.keyTargets) {
-            if (check===target.textContent.trim()) {
+            if (letter === target.textContent.trim()) {
                 this._setButtonClass(target, 'btn-secondary')
             }
         }
+
+        for (let value of this.lettersValue) {
+            if (value.letter === letter) {
+                this.letterTargets[value.index].innerHTML = letter;
+            }
+        }
+
+        for (let value of this.lettersValue) {
+            if (value.isLetter && false === this.solvedLetters.includes(value.index)) {
+
+                // Letters missing...
+                return;
+            }
+        }
+
+        // Everything is solved
+
+        alert(
+            'juhuu'
+        )
     }
 
     _setButtonClass(element, className) {
