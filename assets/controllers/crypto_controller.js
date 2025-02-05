@@ -1,23 +1,18 @@
-import {Controller} from '@hotwired/stimulus';
+import {Controller} from '@hotwired/stimulus'
 
 export default class extends Controller {
 
-    static targets = ['letter', 'key'];
+    static targets = ['letter', 'key']
 
     static values = {
         letters: Array,
         hints: Array,
     }
 
-    selectedLetter = null
+    selectedLetter = -1
     solvedLetters = []
 
     connect() {
-        // console.log(this.lettersValue)
-        // console.log(this.hintsValue)
-        // console.log(this.keyTargets)
-        //console.log(this.letterTargets)
-        //console.error('connecting...')
         for (let target of this.keyTargets) {
             if (this.hintsValue.includes(target.textContent.trim())) {
                 this._setButtonClass(target, 'btn-success')
@@ -29,76 +24,126 @@ export default class extends Controller {
                 if (letter.letter === hint) {
                     this.solvedLetters.push(letter.index)
                     this._setLetter(letter.index, letter)
-                    this._checkLetterCompleted(hint)
+                    this._checkCompleted(hint)
                     break
                 }
             }
         }
+
+        this._selectNextLetter()
     }
 
     selectLetter(event) {
         if (this.solvedLetters.includes(event.params.index)) {
             return
         }
-        console.log('selectLetter', event);
-        console.log('selectLetter index', event.params.index);
-        for (let target of this.letterTargets) {
-            target.classList.remove('letter-selected');
-            target.classList.add('letter');
+
+        this._selectLetter(event.params.index)
+    }
+
+    _selectNextLetter() {
+
+        let found = false
+        let check = this.selectedLetter + 1
+
+        if (check === this.lettersValue.length) {
+            check = 0
         }
 
-        event.target.classList.remove('letter');
-        event.target.classList.add('letter-selected');
+        do {
+            if (this.solvedLetters.includes(check)
+                || this.lettersValue[check].isLetter === false) {
+                check++
+            } else {
+                this._selectLetter(check)
+                found = true
+            }
+        } while (!found)
+    }
 
-        this.selectedLetter = event.params.index;
+    _selectPreviousLetter() {
+
+        let found = false
+        let check = this.selectedLetter - 1
+
+        if (check === -1) {
+            check = this.lettersValue.length - 1
+        }
+
+        do {
+            if (this.solvedLetters.includes(check)
+                || this.lettersValue[check].isLetter === false) {
+                check--
+                if (check < 0) {
+                    check = this.lettersValue.length - 1
+                }
+            } else {
+                this._selectLetter(check)
+                found = true
+            }
+        } while (!found)
+    }
+
+    _selectLetter(index) {
+        for (let target of this.letterTargets) {
+            target.classList.remove('letter-selected')
+            target.classList.add('letter')
+        }
+
+        this.letterTargets[index].classList.remove('letter')
+        this.letterTargets[index].classList.add('letter-selected')
+
+        this.selectedLetter = index
+    }
+
+    _guessLetter(letter) {
+        const l = this.lettersValue[this.selectedLetter]
+
+        if (this.solvedLetters.includes(l.index)) {
+            return
+        }
+
+        if (letter === l.letter) {
+            this.solvedLetters.push(l.index);
+            this._setLetter(this.selectedLetter, l)
+            if (false === this._checkCompleted(letter)) {
+                this._selectNextLetter()
+            }
+        } else {
+            this._updateField(this.selectedLetter, 'Not a '+letter+'<br />'+l.code)
+            // TODO: nicer error
+        }
     }
 
     guessLetter(event) {
-        console.log(event);
-
         if (null === this.selectedLetter) {
-            console.error('Please select a letter');
+            console.error('Please select a letter')
 
             return;
         }
-        const letter = this.lettersValue[this.selectedLetter]
-        console.log(event.params.letter, letter.letter);
-        if (event.params.letter === letter.letter) {
-            this.solvedLetters.push(letter.index)
-            this._setLetter(this.selectedLetter, letter)
-            this._checkLetterCompleted(event.params.letter)
-        } else {
-            this._updateField(this.selectedLetter, 'no')
 
-        }
-
-        console.log(this.selectedLetter);
-
-        console.log(this.letterTargets[this.selectedLetter])
-        console.log(this.lettersValue[this.selectedLetter])
-        //this._setLetter(this.selectedLetter, this.lettersValue[this.selectedLetter]);
+        this._guessLetter(event.params.letter)
     }
 
     handleKeyDown(event) {
-        console.log('handleKeyDown', event);
-        console.log('handleKeyDown', event.key);
         if ('ArrowRight' === event.key) {
-            console.log('arrowRight');
-        }else if ('ArrowLeft' === event.key) {
-            console.log('arrowLeft');
-
+            this._selectNextLetter()
+        } else if ('ArrowLeft' === event.key) {
+            this._selectPreviousLetter()
+        } else {
+            this._guessLetter(event.key.toUpperCase())
         }
     }
 
     _setLetter(targetIndex, letter) {
-        this.letterTargets[targetIndex].innerHTML = letter.letter + '<br />' + letter.code;
+        this.letterTargets[targetIndex].innerHTML = letter.letter + '<br />' + letter.code
     }
 
     _updateField(targetIndex, text) {
-        this.letterTargets[targetIndex].innerHTML = text;
+        this.letterTargets[targetIndex].innerHTML = text
     }
 
-    _checkLetterCompleted(letter) {
+    _checkCompleted(letter) {
         for (let value of this.lettersValue) {
             if (value.letter === letter) {
                 if (false === this.solvedLetters.includes(value.index)) {
@@ -109,7 +154,7 @@ export default class extends Controller {
                     }
 
                     // Letters missing...
-                    return;
+                    return false
                 }
             }
         }
@@ -124,7 +169,7 @@ export default class extends Controller {
 
         for (let value of this.lettersValue) {
             if (value.letter === letter) {
-                this.letterTargets[value.index].innerHTML = letter;
+                this.letterTargets[value.index].innerHTML = letter
             }
         }
 
@@ -132,15 +177,19 @@ export default class extends Controller {
             if (value.isLetter && false === this.solvedLetters.includes(value.index)) {
 
                 // Letters missing...
-                return;
+                return false
             }
         }
 
         // Everything is solved
 
         alert(
-            'juhuu'
+            'Juhuu'
         )
+
+        // TODO: more JUHUUUUU =;)
+
+        return true
     }
 
     _setButtonClass(element, className) {
