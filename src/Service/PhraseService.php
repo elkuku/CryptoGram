@@ -11,7 +11,8 @@ class PhraseService
     private array $phrases;
     private array $stripChars = [' ', ',', '.', '\'', '‘', '’', ';', '-'];
     private array $specialChars = [
-        'de' => ['Ä', 'Ö', 'Ü', 'ß']
+        'de' => ['Ä', 'Ö', 'Ü', 'ß'],
+        'es' => ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ñ', 'Ü'],
     ];
     private string $lang = 'en';
 

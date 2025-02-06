@@ -16,6 +16,7 @@ class DefaultController extends BaseController
     ): Response
     {
         $lang = 'de';
+        $lang = 'es';
         $phraseService->setLang($lang);
         $phrase = $phraseService->getRandomPhrase();
 
