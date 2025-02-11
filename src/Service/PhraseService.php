@@ -12,6 +12,7 @@ class PhraseService
     private array $stripChars = [' ', ',', '.', '\'', '‘', '’', ';', '-'];
     private array $specialChars = [
         'de' => ['Ä', 'Ö', 'Ü', 'ß'],
+        'en' => [],
         'es' => ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ñ', 'Ü'],
     ];
     private string $lang = 'en';
@@ -24,6 +25,10 @@ class PhraseService
 
     public function setLang(string $lang): self
     {
+        if (false === array_key_exists($lang, $this->specialChars)) {
+            throw new \UnexpectedValueException('Language not found.');
+        }
+
         $this->lang = $lang;
 
         return $this;

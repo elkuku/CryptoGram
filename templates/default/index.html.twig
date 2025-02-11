@@ -10,6 +10,11 @@
         }) }}
             {{ stimulus_action('crypto', 'handleKeyDown', 'keydown@window') }}
     >
+        <div class="text-end">
+            {% for l in locales %}
+                <a href="{{ path('app_default', {'_locale':l}) }}">{{ l }}</a>
+            {% endfor %}
+        </div>
         <div class="row row-cols-auto">
             {% for letter in letters %}
                 <div
@@ -58,12 +63,17 @@
 
     <hr>
 
+
+    <div class="text-center">
+        <a href="{{ path('app_default') }}" class="btn btn-success">{{ 'Play again'|trans }}</a>
+
+    </div>
+
     <button class="btn btn-info">A</button> - Vorhanden
     <button class="btn btn-success">A</button> - Gefunden
     <button class="btn btn-secondary">A</button> - Alle gefunden
     <button class="btn btn-outline-secondary" disabled>A</button> - Nicht vorhanden
     <br>
-
     <span title="{{ phrase }}">.</span>
 
 {% endblock %}
