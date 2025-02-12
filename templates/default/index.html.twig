@@ -10,30 +10,18 @@
         }) }}
             {{ stimulus_action('crypto', 'handleKeyDown', 'keydown@window') }}
     >
-        <div class="text-end">
-            {% for l in locales %}
-                <a href="{{ path('app_default', {'_locale':l}) }}">{{ l }}</a>
-            {% endfor %}
-        </div>
-        <div class="row row-cols-auto">
+        <div class="row row-cols-auto cryptoContainer">
             {% for letter in letters %}
                 <div
+                        {{ stimulus_target('crypto', 'letter') }}
                         {% if letter.isLetter %}
                             class="col text-center letter"
-                            {{ stimulus_target('crypto', 'letter') }}
-                            {{ stimulus_action('crypto', 'selectLetter', 'click', {'index':loop.index-1}) }}
+                            {{ stimulus_action('crypto', 'selectLetter', 'click', {'index' : loop.index - 1}) }}
                         {% else %}
-                            {{ stimulus_target('crypto', 'letter') }}
-                            class="col text-center"
+                            class="col"
                         {% endif %}
                 >
-                    {% if letter.isLetter %}
-                        &nbsp;
-                        <br>
-                        {{ letter.code }}
-                    {% else %}
-                        {{ letter.letter }}
-                    {% endif %}
+                    {{ letter.toHTML|raw }}
                 </div>
             {% endfor %}
         </div>
@@ -46,11 +34,11 @@
                     <div class="col text-center">
                         <button
                                 {{ stimulus_target('crypto', 'key') }}
-                                {% if char not in unique_letters %}
-                                    class="btn btn-outline-secondary"  disabled
-                                {% else %}
+                                {% if char in unique_letters %}
                                     class="btn btn-info"
                                     {{ stimulus_action('crypto', 'guessLetter', 'click', {letter:char}) }}
+                                {% else %}
+                                    class="btn btn-outline-secondary"  disabled
                                 {% endif %}
                         >
                             {{ char }}
@@ -63,17 +51,33 @@
 
     <hr>
 
-
     <div class="text-center">
-        <a href="{{ path('app_default') }}" class="btn btn-success">{{ 'Play again'|trans }}</a>
-
+        <a href="{{ path('app_default') }}" class="btn btn-success play-again-button">{{ 'Play again'|trans }}</a>
     </div>
 
-    <button class="btn btn-info">A</button> - Vorhanden
-    <button class="btn btn-success">A</button> - Gefunden
-    <button class="btn btn-secondary">A</button> - Alle gefunden
-    <button class="btn btn-outline-secondary" disabled>A</button> - Nicht vorhanden
+    <hr>
+
+    <div class="container text-center">
+        <div class="row row-cols-auto">
+            <div class="col">
+                <button class="btn btn-info">X</button>
+                <br>{{ 'Present'|trans }}</div>
+            <div class="col">
+                <button class="btn btn-success">X</button>
+                <br>{{ 'Found'|trans }}</div>
+            <div class="col">
+                <button class="btn btn-secondary">X</button>
+                <br>{{ 'All found'|trans }}</div>
+            <div class="col">
+                <button class="btn btn-outline-secondary" disabled>X</button>
+                <br>{{ 'Not present'|trans }}</div>
+        </div>
+    </div>
+
     <br>
+
+    {# TODO: remove this =;) #}
+
     <span title="{{ phrase }}">.</span>
 
 {% endblock %}

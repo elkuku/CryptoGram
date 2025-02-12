@@ -2,13 +2,9 @@ main > .container {
     padding: 60px 15px 0;
 }
 
-.bg-logo {
-    display: inline-block;
-    width: 32px;
-    height: 32px;
-    background-image: url("../images/wtfpl-logo.png");
-    background-size: contain;
-    background-repeat: no-repeat;
+.cryptoContainer {
+    border: 1px solid #146c43;
+    padding: 3px;
 }
 
 .letter {
@@ -17,4 +13,8 @@ main > .container {
 
 .letter-selected {
     border: 2px solid green;
+}
+
+.play-again-button {
+    font-size: 1.3em;
 }
