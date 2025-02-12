@@ -12,17 +12,21 @@ DOCKER_CONTAINER="$(basename "$DIR" | tr "[:upper:]" "[:lower:]")-database-1"
 
 . ./bin/functions.sh
 
+checkIsInstalled php
 checkIsInstalled symfony
 checkIsInstalled docker-compose
 
-echo "🚀 Starting dev env in $DIR ..."
+echo "🚀 Starting dev environment in $DIR ..."
 docker-compose up -d
+echo "✅ Dev environment started."
 
 printf "Waiting for DB to get ready "
 waitContainer "$DOCKER_CONTAINER"
+echo " ✅"
 
-printf "Starting the server... "
+echo "Starting the server... "
 symfony server:start -d
+echo "✅ server started."
 
 printf "Opening page..."
 symfony open:local
