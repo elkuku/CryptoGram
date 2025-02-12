@@ -2,7 +2,7 @@ import {Controller} from '@hotwired/stimulus'
 
 export default class extends Controller {
 
-    static targets = ['letter', 'key']
+    static targets = ['letter', 'key', 'statusError', 'statusSuccess']
 
     static values = {
         letters: Array,
@@ -90,6 +90,11 @@ export default class extends Controller {
             target.classList.add('letter')
         }
 
+        if (-1 === index) {
+            // -1 means: Unselect all
+            return
+        }
+
         this.letterTargets[index].classList.remove('letter')
         this.letterTargets[index].classList.add('letter-selected')
 
@@ -110,7 +115,7 @@ export default class extends Controller {
                 this._selectNextLetter()
             }
         } else {
-            this._updateField(this.selectedLetter, 'Not a '+letter+'<br />'+l.code)
+            this._updateField(this.selectedLetter, 'Not a ' + letter + '<br />' + l.code)
             // TODO: nicer error
         }
     }
@@ -132,6 +137,7 @@ export default class extends Controller {
             this._selectPreviousLetter()
         } else {
             this._guessLetter(event.key.toUpperCase())
+            // TODO: do not capture ALL key strokes ;)
         }
     }
 
@@ -183,9 +189,10 @@ export default class extends Controller {
 
         // Everything is solved
 
-        alert(
-            'Juhuu'
-        )
+        this._selectLetter(-1)
+        this.statusSuccessTarget.style.display = 'block'
+
+        this.statusSuccessTarget.innerText = '@TODO: JUHUUU =;)'
 
         // TODO: more JUHUUUUU =;)
 

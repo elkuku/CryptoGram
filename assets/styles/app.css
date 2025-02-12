@@ -8,7 +8,7 @@ main > .container {
 }
 
 .letter {
-    border: 0px solid grey;
+    border: 1px solid grey;
 }
 
 .letter-selected {
@@ -17,4 +17,8 @@ main > .container {
 
 .play-again-button {
     font-size: 1.3em;
+}
+
+.noLetter {
+    background-color: #818181;
 }

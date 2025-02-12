@@ -18,12 +18,20 @@
                             class="col text-center letter"
                             {{ stimulus_action('crypto', 'selectLetter', 'click', {'index' : loop.index - 1}) }}
                         {% else %}
-                            class="col"
+                            class="col noLetter"
                         {% endif %}
                 >
                     {{ letter.toHTML|raw }}
                 </div>
             {% endfor %}
+        </div>
+
+        <div>
+            <div {{ stimulus_target('crypto', 'statusErrors') }}></div>
+            <div {{ stimulus_target('crypto', 'statusSuccess') }}
+                    class="alert alert-success text-center" style="display: none"
+            >
+            </div>
         </div>
 
         <hr>
