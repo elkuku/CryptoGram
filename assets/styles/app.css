@@ -7,18 +7,24 @@ main > .container {
     padding: 3px;
 }
 
-.letter {
-    border: 1px solid grey;
+.letter:hover {
+    background-color: #4c943a;
+    cursor: pointer;
+}
+
+.letterContainer {
+    border-bottom: 1px solid grey;
+}
+
+.letter-solved {
+    cursor: default;
 }
 
 .letter-selected {
-    border: 2px solid green;
+    background-color: #4c943a;
 }
 
 .play-again-button {
     font-size: 1.3em;
 }
 
-.noLetter {
-    background-color: #818181;
-}

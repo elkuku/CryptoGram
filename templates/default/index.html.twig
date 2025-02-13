@@ -6,6 +6,7 @@
     <div {{ stimulus_controller('crypto',
         {
             'letters': letters,
+            'uniqueLetters': unique_letters,
             'hints': hints,
         }) }}
             {{ stimulus_action('crypto', 'handleKeyDown', 'keydown@window') }}
@@ -18,10 +19,16 @@
                             class="col text-center letter"
                             {{ stimulus_action('crypto', 'selectLetter', 'click', {'index' : loop.index - 1}) }}
                         {% else %}
-                            class="col noLetter"
+                            class="col"
                         {% endif %}
                 >
-                    {{ letter.toHTML|raw }}
+                    <span {% if letter.isLetter %}class="letterContainer"{% endif %}>
+                        {{ letter.isLetter ? '&nbsp;&nbsp;&nbsp;' : letter.letter }}
+                    </span>
+                    <br>
+                    <span>
+                        {{ letter.isLetter ? letter.code : '' }}
+                    </span>
                 </div>
             {% endfor %}
         </div>
@@ -60,7 +67,8 @@
     <hr>
 
     <div class="text-center">
-        <a href="{{ path('app_default') }}" class="btn btn-success play-again-button">{{ 'Play again'|trans }}</a>
+        <a href="{{ path('app_default') }}" class="btn btn-success play-again-button" accesskey="p"
+           title="Alt-P">{{ 'Play again'|trans }}</a>
     </div>
 
     <hr>

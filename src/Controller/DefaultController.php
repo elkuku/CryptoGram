@@ -20,16 +20,13 @@ class DefaultController extends BaseController
 
         $uniqueLetters = $phraseService->getUniqueLetters($phrase);
 
-        $locales = ['en', 'de', 'es'];
-
         return $this->render('default/index.html.twig', [
             'phrase' => $phrase,
             'letters' => $phraseService->getLetters($phrase),
-            'unique_letters' => $uniqueLetters,
+            'unique_letters' => array_values($uniqueLetters),
             'char_list' => $phraseService->getCharList(),
             'hints' => $phraseService->getHints($uniqueLetters, 5),
             'locale' => $localeSwitcher->getLocale(),
-            'locales' => $locales,
         ]);
     }
 

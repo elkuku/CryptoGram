@@ -8,13 +8,4 @@ class Letter
     public bool $isLetter;
     public int $code;
     public int $index;
-
-    public function toHTML():string
-    {
-        if ($this->isLetter) {
-            return '<br>'.$this->code;
-        }
-
-        return $this->letter;
-    }
 }

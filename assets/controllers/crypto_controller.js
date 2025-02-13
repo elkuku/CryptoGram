@@ -6,6 +6,7 @@ export default class extends Controller {
 
     static values = {
         letters: Array,
+        uniqueLetters: Array,
         hints: Array,
     }
 
@@ -20,6 +21,7 @@ export default class extends Controller {
         }
 
         for (let hint of this.hintsValue) {
+            // TODO mark a random letter (not the first one)
             for (let letter of this.lettersValue) {
                 if (letter.letter === hint) {
                     this.solvedLetters.push(letter.index)
@@ -54,6 +56,9 @@ export default class extends Controller {
             if (this.solvedLetters.includes(check)
                 || this.lettersValue[check].isLetter === false) {
                 check++
+                if (check === this.lettersValue.length) {
+                    check = 0
+                }
             } else {
                 this._selectLetter(check)
                 found = true
@@ -87,7 +92,6 @@ export default class extends Controller {
     _selectLetter(index) {
         for (let target of this.letterTargets) {
             target.classList.remove('letter-selected')
-            target.classList.add('letter')
         }
 
         if (-1 === index) {
@@ -95,7 +99,6 @@ export default class extends Controller {
             return
         }
 
-        this.letterTargets[index].classList.remove('letter')
         this.letterTargets[index].classList.add('letter-selected')
 
         this.selectedLetter = index
@@ -136,8 +139,10 @@ export default class extends Controller {
         } else if ('ArrowLeft' === event.key) {
             this._selectPreviousLetter()
         } else {
-            this._guessLetter(event.key.toUpperCase())
-            // TODO: do not capture ALL key strokes ;)
+            const key = event.key.toUpperCase()
+            if (this.uniqueLettersValue.includes(key)) {
+                this._guessLetter(key)
+            }
         }
     }
 
@@ -168,14 +173,15 @@ export default class extends Controller {
         // All letters found
 
         for (let target of this.keyTargets) {
-            if (letter === target.textContent.trim()) {
+            if (target.textContent.trim() === letter) {
                 this._setButtonClass(target, 'btn-secondary')
             }
         }
 
         for (let value of this.lettersValue) {
+            // Remove the "code" numbers from all fields of the "letter"
             if (value.letter === letter) {
-                this.letterTargets[value.index].innerHTML = letter
+                this.letterTargets[value.index].innerText = letter
             }
         }
 
@@ -192,7 +198,7 @@ export default class extends Controller {
         this._selectLetter(-1)
         this.statusSuccessTarget.style.display = 'block'
 
-        this.statusSuccessTarget.innerText = '@TODO: JUHUUU =;)'
+        this.statusSuccessTarget.innerText = '@TODO: localized JUHUUU =;)'
 
         // TODO: more JUHUUUUU =;)
 
