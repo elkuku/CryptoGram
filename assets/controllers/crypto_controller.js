@@ -2,12 +2,13 @@ import {Controller} from '@hotwired/stimulus'
 
 export default class extends Controller {
 
-    static targets = ['letter', 'key', 'statusError', 'statusSuccess']
+    static targets = ['letter', 'key', 'error', 'success']
 
     static values = {
         letters: Array,
         uniqueLetters: Array,
         hints: Array,
+        errors: Number,
     }
 
     selectedLetter = -1
@@ -41,6 +42,33 @@ export default class extends Controller {
         }
 
         this._selectLetter(event.params.index)
+    }
+
+    guessLetter(event) {
+        if (null === this.selectedLetter) {
+            console.error('Please select a letter')
+
+            return;
+        }
+
+        this._guessLetter(event.params.letter)
+    }
+
+    handleKeyDown(event) {
+        if ('ArrowRight' === event.key) {
+            this._selectNextLetter()
+        } else if ('ArrowLeft' === event.key) {
+            this._selectPreviousLetter()
+        } else {
+            const key = event.key.toUpperCase()
+            if (this.uniqueLettersValue.includes(key)) {
+                this._guessLetter(key)
+            }
+        }
+    }
+
+    errorsValueChanged(e) {
+        this.errorTarget.innerHTML = '❌'.repeat(e)
     }
 
     _selectNextLetter() {
@@ -90,18 +118,17 @@ export default class extends Controller {
     }
 
     _selectLetter(index) {
-        for (let target of this.letterTargets) {
-            target.classList.remove('letter-selected')
-        }
-
-        if (-1 === index) {
-            // -1 means: Unselect all
-            return
-        }
+        this._unselectLetters()
 
         this.letterTargets[index].classList.add('letter-selected')
 
         this.selectedLetter = index
+    }
+
+    _unselectLetters() {
+        for (let target of this.letterTargets) {
+            target.classList.remove('letter-selected')
+        }
     }
 
     _guessLetter(letter) {
@@ -119,30 +146,8 @@ export default class extends Controller {
             }
         } else {
             this._updateField(this.selectedLetter, 'Not a ' + letter + '<br />' + l.code)
+            this.errorsValue++
             // TODO: nicer error
-        }
-    }
-
-    guessLetter(event) {
-        if (null === this.selectedLetter) {
-            console.error('Please select a letter')
-
-            return;
-        }
-
-        this._guessLetter(event.params.letter)
-    }
-
-    handleKeyDown(event) {
-        if ('ArrowRight' === event.key) {
-            this._selectNextLetter()
-        } else if ('ArrowLeft' === event.key) {
-            this._selectPreviousLetter()
-        } else {
-            const key = event.key.toUpperCase()
-            if (this.uniqueLettersValue.includes(key)) {
-                this._guessLetter(key)
-            }
         }
     }
 
@@ -182,6 +187,7 @@ export default class extends Controller {
             // Remove the "code" numbers from all fields of the "letter"
             if (value.letter === letter) {
                 this.letterTargets[value.index].innerText = letter
+                this.letterTargets[value.index].classList.remove('letter')
             }
         }
 
@@ -193,12 +199,12 @@ export default class extends Controller {
             }
         }
 
-        // Everything is solved
+        // Everything is solved!
 
-        this._selectLetter(-1)
-        this.statusSuccessTarget.style.display = 'block'
+        this._unselectLetters()
+        this.successTarget.style.display = 'block'
 
-        this.statusSuccessTarget.innerText = '@TODO: localized JUHUUU =;)'
+        this.successTarget.innerText = '@TODO: localized JUHUUU =;)'
 
         // TODO: more JUHUUUUU =;)
 

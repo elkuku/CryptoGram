@@ -11,6 +11,8 @@
         }) }}
             {{ stimulus_action('crypto', 'handleKeyDown', 'keydown@window') }}
     >
+        <div class="alert alert-warning">{{ 'Errors'|trans }}: <span {{ stimulus_target('crypto', 'error') }}></span></div>
+
         <div class="row row-cols-auto cryptoContainer">
             {% for letter in letters %}
                 <div
@@ -34,8 +36,7 @@
         </div>
 
         <div>
-            <div {{ stimulus_target('crypto', 'statusErrors') }}></div>
-            <div {{ stimulus_target('crypto', 'statusSuccess') }}
+            <div {{ stimulus_target('crypto', 'success') }}
                     class="alert alert-success text-center" style="display: none"
             >
             </div>
