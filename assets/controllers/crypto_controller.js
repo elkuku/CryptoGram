@@ -8,6 +8,7 @@ export default class extends Controller {
         letters: Array,
         uniqueLetters: Array,
         hints: Array,
+        hoorays: Array,
         errors: Number,
     }
 
@@ -15,6 +16,7 @@ export default class extends Controller {
     solvedLetters = []
 
     connect() {
+        console.log(this.hooraysValue[Math.floor(Math.random() * 5)])
         for (let target of this.keyTargets) {
             if (this.hintsValue.includes(target.textContent.trim())) {
                 this._setButtonClass(target, 'btn-success')
@@ -204,7 +206,7 @@ export default class extends Controller {
         this._unselectLetters()
         this.successTarget.style.display = 'block'
 
-        this.successTarget.innerText = '@TODO: localized JUHUUU =;)'
+        this.successTarget.innerText = this.hooraysValue[Math.floor(Math.random() * 5)]
 
         // TODO: more JUHUUUUU =;)
 

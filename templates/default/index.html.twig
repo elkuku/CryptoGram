@@ -8,10 +8,13 @@
             'letters': letters,
             'uniqueLetters': unique_letters,
             'hints': hints,
+            'hoorays': ['hooray.0'|trans, 'hooray.1'|trans, 'hooray.2'|trans,
+            'hooray.3'|trans, 'hooray.4'|trans,]
         }) }}
             {{ stimulus_action('crypto', 'handleKeyDown', 'keydown@window') }}
     >
-        <div class="alert alert-warning">{{ 'Errors'|trans }}: <span {{ stimulus_target('crypto', 'error') }}></span></div>
+        <div class="alert alert-warning">{{ 'Errors'|trans }}: <span {{ stimulus_target('crypto', 'error') }}></span>
+        </div>
 
         <div class="row row-cols-auto cryptoContainer">
             {% for letter in letters %}
@@ -51,8 +54,8 @@
                         <button
                                 {{ stimulus_target('crypto', 'key') }}
                                 {% if char in unique_letters %}
+                                    {{ stimulus_action('crypto', 'guessLetter', 'click', {letter : char}) }}
                                     class="btn btn-info"
-                                    {{ stimulus_action('crypto', 'guessLetter', 'click', {letter:char}) }}
                                 {% else %}
                                     class="btn btn-outline-secondary"  disabled
                                 {% endif %}
@@ -68,8 +71,13 @@
     <hr>
 
     <div class="text-center">
-        <a href="{{ path('app_default') }}" class="btn btn-success play-again-button" accesskey="p"
-           title="Alt-P">{{ 'Play again'|trans }}</a>
+        <a href="{{ path('app_default') }}"
+           class="btn btn-success play-again-button"
+           accesskey="p"
+           title="Alt-P"
+        >
+            {{ 'Play again'|trans }}
+        </a>
     </div>
 
     <hr>
@@ -94,7 +102,6 @@
     <br>
 
     {# TODO: remove this =;) #}
-
     <span title="{{ phrase }}">.</span>
 
 {% endblock %}
