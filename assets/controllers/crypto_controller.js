@@ -2,33 +2,61 @@ import {Controller} from '@hotwired/stimulus'
 
 export default class extends Controller {
 
-    static targets = ['letter', 'key', 'error', 'success']
+    static targets = ['letter', 'key', 'error', 'errorContainer', 'success']
 
     static values = {
-        letters: Array,
-        uniqueLetters: Array,
-        hints: Array,
+        phrase: String,
+        noLetters: Array,
         hoorays: Array,
         errors: Number,
     }
 
+    letters = []
+    uniqueLetters = []
     selectedLetter = -1
     solvedLetters = []
 
     connect() {
-        console.log(this.hooraysValue[Math.floor(Math.random() * 5)])
-        for (let target of this.keyTargets) {
-            if (this.hintsValue.includes(target.textContent.trim())) {
-                this._setButtonClass(target, 'btn-success')
+        this.letters = [...this.phraseValue.toUpperCase()]
+
+        this.uniqueLetters = this.letters
+            .filter((value, index, array) => array.indexOf(value) === index)
+            .filter((value) => false === this.noLettersValue.includes(value))
+            .sort(() => .5 - Math.random())
+
+        const hints = []
+        const maxHints = 5
+
+        do {
+            let hint = this.uniqueLetters[Math.floor(Math.random() * this.uniqueLetters.length)];
+            if (false === hints.includes(hint)) {
+                hints.push(hint)
+            }
+        } while (hints.length < maxHints);
+
+        for (const [index, letter] of this.letters.entries()) {
+            if (this._isLetter(letter)) {
+                this._setLetter(index, '&nbsp;&nbsp;&nbsp;', this._getCode(letter))
+            } else {
+                this._setLetter(index, null, letter)
             }
         }
 
-        for (let hint of this.hintsValue) {
+        for (let target of this.keyTargets) {
+            if (this.uniqueLetters.includes(target.textContent.trim())) {
+                this._setButtonClass(target, 'btn-info');
+            } else {
+                this._setButtonClass(target, 'btn-outline-secondary');
+                target.setAttribute('disabled', 'disabled')
+            }
+        }
+
+        for (let hint of hints) {
             // TODO mark a random letter (not the first one)
-            for (let letter of this.lettersValue) {
-                if (letter.letter === hint) {
-                    this.solvedLetters.push(letter.index)
-                    this._setLetter(letter.index, letter)
+            for (let [index, letter] of this.letters.entries()) {
+                if (letter === hint) {
+                    this.solvedLetters.push(index)
+                    this._setLetter(index, letter, this._getCode(letter))
                     this._checkCompleted(hint)
                     break
                 }
@@ -40,6 +68,10 @@ export default class extends Controller {
 
     selectLetter(event) {
         if (this.solvedLetters.includes(event.params.index)) {
+            return
+        }
+
+        if (false === this._isLetter(this.letters[event.params.index])) {
             return
         }
 
@@ -63,7 +95,7 @@ export default class extends Controller {
             this._selectPreviousLetter()
         } else {
             const key = event.key.toUpperCase()
-            if (this.uniqueLettersValue.includes(key)) {
+            if (this.uniqueLetters.includes(key)) {
                 this._guessLetter(key)
             }
         }
@@ -71,6 +103,10 @@ export default class extends Controller {
 
     errorsValueChanged(e) {
         this.errorTarget.innerHTML = '❌'.repeat(e)
+        if (e) {
+            this.errorContainerTarget.style.display = 'block';
+
+        }
     }
 
     _selectNextLetter() {
@@ -78,15 +114,15 @@ export default class extends Controller {
         let found = false
         let check = this.selectedLetter + 1
 
-        if (check === this.lettersValue.length) {
+        if (check === this.letters.length) {
             check = 0
         }
 
         do {
             if (this.solvedLetters.includes(check)
-                || this.lettersValue[check].isLetter === false) {
+                || this._isLetter(this.letters[check]) === false) {
                 check++
-                if (check === this.lettersValue.length) {
+                if (check === this.letters.length) {
                     check = 0
                 }
             } else {
@@ -102,15 +138,15 @@ export default class extends Controller {
         let check = this.selectedLetter - 1
 
         if (check === -1) {
-            check = this.lettersValue.length - 1
+            check = this.letters.length - 1
         }
 
         do {
             if (this.solvedLetters.includes(check)
-                || this.lettersValue[check].isLetter === false) {
+                || this._isLetter(this.letters[check]) === false) {
                 check--
                 if (check < 0) {
-                    check = this.lettersValue.length - 1
+                    check = this.letters.length - 1
                 }
             } else {
                 this._selectLetter(check)
@@ -134,27 +170,28 @@ export default class extends Controller {
     }
 
     _guessLetter(letter) {
-        const l = this.lettersValue[this.selectedLetter]
-
-        if (this.solvedLetters.includes(l.index)) {
+        if (this.solvedLetters.includes(this.selectedLetter)) {
             return
         }
 
-        if (letter === l.letter) {
-            this.solvedLetters.push(l.index);
-            this._setLetter(this.selectedLetter, l)
+        if (letter === this.letters[this.selectedLetter]) {
+            this.solvedLetters.push(this.selectedLetter);
+            this._setLetter(this.selectedLetter, letter, this._getCode(letter))
             if (false === this._checkCompleted(letter)) {
                 this._selectNextLetter()
             }
         } else {
-            this._updateField(this.selectedLetter, 'Not a ' + letter + '<br />' + l.code)
+            this._updateField(this.selectedLetter, 'Not a ' + letter + '<br />' + this._getCode(letter))
             this.errorsValue++
             // TODO: nicer error
         }
     }
 
-    _setLetter(targetIndex, letter) {
-        this.letterTargets[targetIndex].innerHTML = letter.letter + '<br />' + letter.code
+    _setLetter(targetIndex, letter, code) {
+        this.letterTargets[targetIndex].innerHTML = (letter
+                ? '<div class="letterContainer">' + letter + '</div>'
+                : '')
+            + code
     }
 
     _updateField(targetIndex, text) {
@@ -162,9 +199,9 @@ export default class extends Controller {
     }
 
     _checkCompleted(letter) {
-        for (let value of this.lettersValue) {
-            if (value.letter === letter) {
-                if (false === this.solvedLetters.includes(value.index)) {
+        for (let [index, value] of this.letters.entries()) {
+            if (value === letter) {
+                if (false === this.solvedLetters.includes(index)) {
                     for (let target of this.keyTargets) {
                         if (target.textContent.trim() === letter) {
                             this._setButtonClass(target, 'btn-success')
@@ -185,16 +222,16 @@ export default class extends Controller {
             }
         }
 
-        for (let value of this.lettersValue) {
+        for (let [index, value] of this.letters.entries()) {
             // Remove the "code" numbers from all fields of the "letter"
-            if (value.letter === letter) {
-                this.letterTargets[value.index].innerText = letter
-                this.letterTargets[value.index].classList.remove('letter')
+            if (value === letter) {
+                this.letterTargets[index].innerText = letter
+                this.letterTargets[index].classList.remove('letter')
             }
         }
 
-        for (let value of this.lettersValue) {
-            if (value.isLetter && false === this.solvedLetters.includes(value.index)) {
+        for (let [index, value] of this.letters.entries()) {
+            if (this._isLetter(value) && false === this.solvedLetters.includes(index)) {
 
                 // Letters missing...
                 return false
@@ -218,5 +255,13 @@ export default class extends Controller {
         element.classList.remove('btn-secondary')
         element.classList.remove('btn-info')
         element.classList.add(className)
+    }
+
+    _isLetter(letter) {
+        return !this.noLettersValue.includes(letter)
+    }
+
+    _getCode(letter) {
+        return this.uniqueLetters.indexOf(letter) + 1
     }
 }

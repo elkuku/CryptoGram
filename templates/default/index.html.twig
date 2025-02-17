@@ -5,15 +5,18 @@
 {% block body %}
     <div {{ stimulus_controller('crypto',
         {
-            'letters': letters,
-            'uniqueLetters': unique_letters,
-            'hints': hints,
+            'phrase' :phrase,
+            'noLetters' :noLetters,
+
             'hoorays': ['hooray.0'|trans, 'hooray.1'|trans, 'hooray.2'|trans,
             'hooray.3'|trans, 'hooray.4'|trans,]
         }) }}
             {{ stimulus_action('crypto', 'handleKeyDown', 'keydown@window') }}
     >
-        <div class="alert alert-warning">{{ 'Errors'|trans }}: <span {{ stimulus_target('crypto', 'error') }}></span>
+        <div {{ stimulus_target('crypto', 'errorContainer')}}
+                style="display:none;" class="alert alert-warning"
+        >
+            {{ 'Errors'|trans }}: <span {{ stimulus_target('crypto', 'error') }}></span>
         </div>
 
         <div class="row row-cols-auto cryptoContainer">
@@ -49,11 +52,11 @@
 
         <div>
             <div class="row row-cols-auto">
-                {% for char in char_list %}
+                {% for char in charList %}
                     <div class="col text-center">
                         <button
                                 {{ stimulus_target('crypto', 'key') }}
-                                {% if char in unique_letters %}
+                                {% if char in uniqueLetters %}
                                     {{ stimulus_action('crypto', 'guessLetter', 'click', {letter : char}) }}
                                     class="btn btn-info"
                                 {% else %}

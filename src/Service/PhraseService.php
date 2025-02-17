@@ -100,4 +100,9 @@ class PhraseService
     {
         return array_merge(range('A', 'Z'), $this->specialChars[$this->lang]);
     }
+
+    public function getStripChars(): array
+    {
+        return $this->stripChars;
+    }
 }

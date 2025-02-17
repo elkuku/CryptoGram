@@ -22,10 +22,11 @@ class DefaultController extends BaseController
 
         return $this->render('default/index.html.twig', [
             'phrase' => $phrase,
+            'noLetters' => $phraseService->getStripChars(),
+
             'letters' => $phraseService->getLetters($phrase),
-            'unique_letters' => array_values($uniqueLetters),
-            'char_list' => $phraseService->getCharList(),
-            'hints' => $phraseService->getHints($uniqueLetters, 5),
+            'uniqueLetters' => array_values($uniqueLetters),
+            'charList' => $phraseService->getCharList(),
             'locale' => $localeSwitcher->getLocale(),
         ]);
     }
