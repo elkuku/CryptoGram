@@ -61,6 +61,7 @@ export default class extends Controller {
             }
         }
 
+        this.selectedLetter =-1
         this._selectNextLetter()
     }
 
