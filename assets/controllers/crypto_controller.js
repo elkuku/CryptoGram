@@ -35,11 +35,8 @@ export default class extends Controller {
         } while (hints.length < maxHints);
 
         for (const [index, letter] of this.letters.entries()) {
-            if (this._isLetter(letter)) {
-                this._setLetter(index, '&nbsp;&nbsp;&nbsp;', this._getCode(letter))
-            } else {
-                this._setLetter(index, letter, null)
-            }
+            this.selectedLetter = index
+            this._setLetter(letter, false)
         }
 
         for (let target of this.keyTargets) {
@@ -56,7 +53,8 @@ export default class extends Controller {
             for (let [index, letter] of this.letters.entries()) {
                 if (letter === hint) {
                     this.solvedLetters.push(index)
-                    this._setLetter(index, letter, this._getCode(letter))
+                    this.selectedLetter = index
+                    this._setLetter(letter)
                     this._isCompleted(hint)
                     break
                 }
@@ -173,7 +171,7 @@ export default class extends Controller {
             return
         }
 
-        this._setLetter(this.selectedLetter, letter, this._getCode(letter))
+        this._setLetter(letter)
 
         if (letter === this.letters[this.selectedLetter]) {
             this.solvedLetters.push(this.selectedLetter);
@@ -188,9 +186,11 @@ export default class extends Controller {
         }
     }
 
-    _setLetter(targetIndex, letter, code) {
-        this.letterTargets[targetIndex].innerHTML = code
-            ? '<div class="letterContainer">' + letter + '</div>' + code
+    _setLetter(letter, reveal = true) {
+        const code = this._getCode(letter)
+        const content = reveal ? letter : '&nbsp;&nbsp;&nbsp;'
+        this.letterTargets[this.selectedLetter].innerHTML = code
+            ? '<div class="letterContainer">' + content + '</div>' + code
             : letter
     }
 
