@@ -38,7 +38,7 @@ export default class extends Controller {
             if (this._isLetter(letter)) {
                 this._setLetter(index, '&nbsp;&nbsp;&nbsp;', this._getCode(letter))
             } else {
-                this._setLetter(index, null, letter)
+                this._setLetter(index, letter, null)
             }
         }
 
@@ -57,7 +57,7 @@ export default class extends Controller {
                 if (letter === hint) {
                     this.solvedLetters.push(index)
                     this._setLetter(index, letter, this._getCode(letter))
-                    this._checkCompleted(hint)
+                    this._isCompleted(hint)
                     break
                 }
             }
@@ -105,7 +105,6 @@ export default class extends Controller {
         this.errorTarget.innerHTML = '❌'.repeat(e)
         if (e) {
             this.errorContainerTarget.style.display = 'block';
-
         }
     }
 
@@ -174,31 +173,28 @@ export default class extends Controller {
             return
         }
 
+        this._setLetter(this.selectedLetter, letter, this._getCode(letter))
+
         if (letter === this.letters[this.selectedLetter]) {
             this.solvedLetters.push(this.selectedLetter);
-            this._setLetter(this.selectedLetter, letter, this._getCode(letter))
-            if (false === this._checkCompleted(letter)) {
+            this._setLetterError(false)
+            if (false === this._isCompleted(letter)) {
                 this._selectNextLetter()
             }
         } else {
-            this._updateField(this.selectedLetter, 'Not a ' + letter + '<br />' + this._getCode(letter))
+            this._setLetterError()
             this.errorsValue++
             // TODO: nicer error
         }
     }
 
     _setLetter(targetIndex, letter, code) {
-        this.letterTargets[targetIndex].innerHTML = (letter
-                ? '<div class="letterContainer">' + letter + '</div>'
-                : '')
-            + code
+        this.letterTargets[targetIndex].innerHTML = code
+            ? '<div class="letterContainer">' + letter + '</div>' + code
+            : letter
     }
 
-    _updateField(targetIndex, text) {
-        this.letterTargets[targetIndex].innerHTML = text
-    }
-
-    _checkCompleted(letter) {
+    _isCompleted(letter) {
         for (let [index, value] of this.letters.entries()) {
             if (value === letter) {
                 if (false === this.solvedLetters.includes(index)) {
@@ -208,28 +204,30 @@ export default class extends Controller {
                         }
                     }
 
-                    // Letters missing...
+                    // Letters "X" missing...
                     return false
                 }
             }
         }
 
-        // All letters found
+        // All letters "X" found
 
         for (let target of this.keyTargets) {
             if (target.textContent.trim() === letter) {
                 this._setButtonClass(target, 'btn-secondary')
+                break
             }
         }
 
+        // Remove the "code" numbers from all fields of the letter "X"
         for (let [index, value] of this.letters.entries()) {
-            // Remove the "code" numbers from all fields of the "letter"
             if (value === letter) {
                 this.letterTargets[index].innerText = letter
                 this.letterTargets[index].classList.remove('letter')
             }
         }
 
+        // Check ALL letters
         for (let [index, value] of this.letters.entries()) {
             if (this._isLetter(value) && false === this.solvedLetters.includes(index)) {
 
@@ -263,5 +261,13 @@ export default class extends Controller {
 
     _getCode(letter) {
         return this.uniqueLetters.indexOf(letter) + 1
+    }
+
+    _setLetterError(error = true) {
+        if (error) {
+            this.letterTargets[this.selectedLetter].classList.add('letter-error')
+        } else {
+            this.letterTargets[this.selectedLetter].classList.remove('letter-error')
+        }
     }
 }

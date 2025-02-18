@@ -24,6 +24,10 @@ main > .container {
     background-color: #4c943a;
 }
 
+.letter-error {
+    border: 1px dashed #cd7c6f;
+}
+
 .play-again-button {
     font-size: 1.3em;
 }

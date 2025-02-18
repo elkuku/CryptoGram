@@ -30,13 +30,7 @@
                             class="col"
                         {% endif %}
                 >
-                    <span {% if letter.isLetter %}class="letterContainer"{% endif %}>
-                        {{ letter.isLetter ? '&nbsp;&nbsp;&nbsp;' : letter.letter }}
-                    </span>
-                    <br>
-                    <span>
-                        {{ letter.isLetter ? letter.code : '' }}
-                    </span>
+                    <br><br>
                 </div>
             {% endfor %}
         </div>
