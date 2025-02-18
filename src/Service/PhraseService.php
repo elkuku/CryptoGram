@@ -9,7 +9,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class PhraseService
 {
     private array $phrases;
-    private array $stripChars = [' ', ',', '.', '\'', '‘', '’', ';', '-'];
+    private array $stripChars = [' ', ',', '.', '"', '\'', '‘', '’', ';', '-'];
     private array $specialChars = [
         'de' => ['Ä', 'Ö', 'Ü', 'ß'],
         'en' => [],
